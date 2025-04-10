@@ -1,6 +1,8 @@
 package br.com.diademaenforma.enformaplus.service;
 
 
+import br.com.diademaenforma.enformaplus.model.user.Especialidade;
+import br.com.diademaenforma.enformaplus.model.user.Papel;
 import br.com.diademaenforma.enformaplus.model.user.User;
 import br.com.diademaenforma.enformaplus.model.user.UserDTO;
 import br.com.diademaenforma.enformaplus.repository.UserRepository;
@@ -30,7 +32,6 @@ public class UserService {
         return users.stream().map(this::convertToDTO).toList();
     }
 
-    // Conversão para DTO
     private UserDTO convertToDTO(User user) {
         if (user == null) return null;
         UserDTO dto = new UserDTO();
@@ -38,18 +39,21 @@ public class UserService {
         dto.setUsuario(user.getUsuario());
         dto.setEmail(user.getEmail());
         dto.setSenha(user.getSenha());
-        dto.setPapel(user.getPapel());
+        dto.setPapel(user.getPapel() != null ? user.getPapel().name() : null);
+        dto.setEspecialidade(user.getEspecialidade() != null ? user.getEspecialidade().name() : null);
         return dto;
     }
 
-    // Conversão para Entity
     private User convertToEntity(UserDTO dto) {
         User user = new User();
         user.setId(dto.getId());
         user.setUsuario(dto.getUsuario());
         user.setEmail(dto.getEmail());
         user.setSenha(dto.getSenha());
-        user.setPapel(dto.getPapel());
+        if (dto.getPapel() != null)
+            user.setPapel(Papel.valueOf(dto.getPapel()));
+        if (dto.getEspecialidade() != null)
+            user.setEspecialidade(Especialidade.valueOf(dto.getEspecialidade()));
         return user;
     }
 }

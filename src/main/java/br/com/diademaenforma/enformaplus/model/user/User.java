@@ -17,8 +17,10 @@ public class User {
     private String email;
     private String senha;
     private String telefone;
-    private String papel;
-    private String especialidade;
+    @Enumerated(EnumType.STRING)
+    private Papel papel;
+    @Enumerated(EnumType.STRING)
+    private Especialidade especialidade;
     @CreationTimestamp
     private String dataCriacao;
     @UpdateTimestamp
