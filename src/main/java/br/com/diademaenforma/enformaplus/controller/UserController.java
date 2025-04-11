@@ -16,32 +16,49 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public UserDTO findUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public ResponseEntity<?> findUserById(@PathVariable Long id) {
+        UserDTO user = userService.getUserById(id);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.status(404).body("Usuário com esse ID não encontrado..");
     }
 
     @GetMapping()
-    public List<UserDTO> findAllUsers() {
-        return userService.showAllUsers();
+    public ResponseEntity<?> findAllUsers() {
+        List<UserDTO> users = userService.showAllUsers();
+        if (users.isEmpty()) {
+            return ResponseEntity.status(404).body("Nenhum usuário encontrado.");
+        }
+        return ResponseEntity.ok(users);
     }
 
     @PostMapping("/criar")
-    public UserDTO createUser(@RequestBody UserDTO userDTO) {
-        return userService.saveUser(userDTO);
+    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
+        try {
+            UserDTO created = userService.saveUser(userDTO);
+            return ResponseEntity.status(201).body(created);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Falha ao criar o usuário.");
+        }
     }
 
     @PutMapping("/atualizar/{id}")
-    public UserDTO updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         userDTO.setId(id);
-        return userService.updateUser(userDTO);
+        UserDTO updatedUser = userService.updateUser(userDTO);
+        if (updatedUser != null) {
+            return ResponseEntity.ok(updatedUser);
+        }
+        return ResponseEntity.status(404).body("Usuário não encontrado para atualização.");
     }
 
     @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         if (userService.deleteUserById(id)) {
-            return ResponseEntity.noContent().build(); // 204 No Content
+            return ResponseEntity.ok("Usuário deletado com sucesso.");
         } else {
-            return ResponseEntity.notFound().build(); // 404 Not Found
+            return ResponseEntity.status(404).body("Usuário não encontrado para deletar.");
         }
     }
 
