@@ -13,4 +13,7 @@ public class UserDTO {
     private String senha;
     private String papel;
     private String especialidade;
+    private String dataCriacao;
+    private String dataAtualizacao;
+
 }

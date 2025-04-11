@@ -32,6 +32,32 @@ public class UserService {
         return users.stream().map(this::convertToDTO).toList();
     }
 
+    public UserDTO updateUser(UserDTO userDTO) {
+        User existingUser = userRepository.findById(userDTO.getId()).orElse(null);
+        if (existingUser == null) return null;
+
+        if (userDTO.getUsuario() != null)
+            existingUser.setUsuario(userDTO.getUsuario());
+        if (userDTO.getEmail() != null)
+            existingUser.setEmail(userDTO.getEmail());
+        if (userDTO.getSenha() != null)
+            existingUser.setSenha(userDTO.getSenha());
+        if (userDTO.getPapel() != null)
+            existingUser.setPapel(Papel.valueOf(userDTO.getPapel()));
+        if (userDTO.getEspecialidade() != null)
+            existingUser.setEspecialidade(Especialidade.valueOf(userDTO.getEspecialidade()));
+
+        return convertToDTO(userRepository.save(existingUser));
+    }
+
+    public boolean deleteUserById(Long id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
     private UserDTO convertToDTO(User user) {
         if (user == null) return null;
         UserDTO dto = new UserDTO();
@@ -41,8 +67,11 @@ public class UserService {
         dto.setSenha(user.getSenha());
         dto.setPapel(user.getPapel() != null ? user.getPapel().name() : null);
         dto.setEspecialidade(user.getEspecialidade() != null ? user.getEspecialidade().name() : null);
+        dto.setDataCriacao(user.getDataCriacao());
+        dto.setDataAtualizacao(user.getDataAtualizacao());
         return dto;
     }
+
 
     private User convertToEntity(UserDTO dto) {
         User user = new User();
