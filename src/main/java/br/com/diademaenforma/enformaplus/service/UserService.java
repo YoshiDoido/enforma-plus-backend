@@ -83,6 +83,17 @@ public class UserService {
         return users.stream().map(this::convertToDTO).toList();
     }
 
+    // Método para fazer login com usuário cadastrado
+    public UserDTO login(String email, String senha) {
+        User user = userRepository.findByEmail(email)
+                .orElse(null);
+
+        if (user != null && user.getSenha().equals(senha)) {
+            return convertToDTO(user);
+        }
+        return null;
+    }
+
     private UserDTO convertToDTO(User user) {
         if (user == null) return null;
         UserDTO dto = new UserDTO();
