@@ -2,6 +2,7 @@ package br.com.diademaenforma.enformaplus.service;
 
 import br.com.diademaenforma.enformaplus.exceptions.UsuarioNaoEncontradoException;
 import br.com.diademaenforma.enformaplus.model.agendamento.*;
+import br.com.diademaenforma.enformaplus.model.user.Especialidade;
 import br.com.diademaenforma.enformaplus.model.user.User;
 import br.com.diademaenforma.enformaplus.repository.AgendamentoRepository;
 import br.com.diademaenforma.enformaplus.repository.UserRepository;
@@ -81,6 +82,48 @@ public class AgendamentoService {
         return toResponseDTO(agendamento);
     }
 
+    public List<AgendamentoResponseDTO> getAgendamentoByEspecialidade(Especialidade especialidade) {
+        return agendamentoRepository.findByProfissionalResponsavel_Especialidade(especialidade)
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    public List<AgendamentoResponseDTO> getAgendamentosPorTipo(Tipo tipo) {
+        return agendamentoRepository.findByTipo(tipo)
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    public List<AgendamentoResponseDTO> getAgendamentosPorUsuarioCliente(Long id) {
+        return agendamentoRepository.findByUsuarioCliente_Id(id)
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    public List<AgendamentoResponseDTO> getAgendamentosPorProfissional(Long id) {
+        return agendamentoRepository.findByProfissionalResponsavel_Id(id)
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    public List<AgendamentoResponseDTO> getAgendamentosPorNomeCliente(String nome) {
+        return agendamentoRepository.findByUsuarioCliente_UsuarioContainingIgnoreCase(nome)
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    public List<AgendamentoResponseDTO> getAgendamentosPorNomeProfissional(String nome) {
+        return agendamentoRepository.findByProfissionalResponsavel_UsuarioContainingIgnoreCase(nome)
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
     private AgendamentoResponseDTO toResponseDTO(Agendamento a) {
         UsuarioResumoDTO cliente = new UsuarioResumoDTO();
         cliente.setId(a.getUsuarioCliente().getId());
@@ -92,6 +135,7 @@ public class AgendamentoService {
         profissional.setEspecialidade(a.getProfissionalResponsavel().getEspecialidade().name());
 
         AgendamentoResponseDTO dto = new AgendamentoResponseDTO();
+        dto.setId(a.getId());  // Incluindo o ID
         dto.setData(a.getData());
         dto.setHora(a.getHora());
         dto.setDescricao(a.getDescricao());
