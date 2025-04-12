@@ -1,5 +1,6 @@
 package br.com.diademaenforma.enformaplus.controller;
 
+import br.com.diademaenforma.enformaplus.exceptions.UsuarioNaoEncontradoException;
 import br.com.diademaenforma.enformaplus.model.agendamento.AgendamentoRequestDTO;
 import br.com.diademaenforma.enformaplus.model.agendamento.AgendamentoResponseDTO;
 import br.com.diademaenforma.enformaplus.service.AgendamentoService;
@@ -17,31 +18,54 @@ public class AgendamentoController {
     AgendamentoService agendamentoService;
 
     @GetMapping
-    public ResponseEntity<List<AgendamentoResponseDTO>> listarAgendamentos() {
-        return ResponseEntity.ok(agendamentoService.getAllAgendamentos());
+    public ResponseEntity<?> listarAgendamentos() {
+        List<AgendamentoResponseDTO> lista = agendamentoService.getAllAgendamentos();
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(404).body("Nenhum agendamento encontrado.");
+        }
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AgendamentoResponseDTO> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(agendamentoService.getAgendamentoById(id));
+    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
+        AgendamentoResponseDTO agendamento = agendamentoService.getAgendamentoById(id);
+        if (agendamento != null) {
+            return ResponseEntity.ok(agendamento);
+        }
+        return ResponseEntity.status(404).body("Agendamento com esse ID não encontrado.");
     }
 
     @PostMapping("/criar")
-    public ResponseEntity<AgendamentoResponseDTO> criarAgendamento(@RequestBody AgendamentoRequestDTO dto) {
-        AgendamentoResponseDTO response = agendamentoService.createAgendamento(dto);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> criarAgendamento(@RequestBody AgendamentoRequestDTO dto) {
+        try {
+            AgendamentoResponseDTO response = agendamentoService.createAgendamento(dto);
+            return ResponseEntity.status(201).body(response);
+        } catch (UsuarioNaoEncontradoException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Erro ao criar o agendamento.");
+        }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        agendamentoService.deleteAgendamento(id);
-        return ResponseEntity.noContent().build();
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<?> deletar(@PathVariable Long id) {
+        try {
+            agendamentoService.deleteAgendamento(id);
+            return ResponseEntity.ok("Agendamento deletado com sucesso.");
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body("Agendamento não encontrado para deletar.");
+        }
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<AgendamentoResponseDTO> atualizarStatus(@PathVariable Long id, @RequestParam String status) {
-        AgendamentoResponseDTO response = agendamentoService.updateStatus(id, status);
-        return ResponseEntity.ok(response);
+    @PatchMapping("/status/{id}")
+    public ResponseEntity<?> atualizarStatus(@PathVariable Long id, @RequestParam String status) {
+        try {
+            AgendamentoResponseDTO response = agendamentoService.updateStatus(id, status);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Erro ao atualizar o status do agendamento.");
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package br.com.diademaenforma.enformaplus.service;
 
+import br.com.diademaenforma.enformaplus.exceptions.UsuarioNaoEncontradoException;
 import br.com.diademaenforma.enformaplus.model.agendamento.*;
 import br.com.diademaenforma.enformaplus.model.user.User;
 import br.com.diademaenforma.enformaplus.repository.AgendamentoRepository;
@@ -7,7 +8,9 @@ import br.com.diademaenforma.enformaplus.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AgendamentoService {
@@ -19,11 +22,21 @@ public class AgendamentoService {
     private AgendamentoRepository agendamentoRepository;
 
     public AgendamentoResponseDTO createAgendamento(AgendamentoRequestDTO dto) {
-        User cliente = userRepository.findById(dto.getUsuarioClienteId()).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        List<Long> idsNaoEncontrados = new ArrayList<>();
 
-        User profissional = userRepository.findById(dto.getProfissionalResponsavelId()).orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
+        Optional<User> clienteOpt = userRepository.findById(dto.getUsuarioClienteId());
+        Optional<User> profissionalOpt = userRepository.findById(dto.getProfissionalResponsavelId());
 
-        if (cliente == null || profissional == null) return null;
+        if (clienteOpt.isEmpty()) idsNaoEncontrados.add(dto.getUsuarioClienteId());
+        if (profissionalOpt.isEmpty()) idsNaoEncontrados.add(dto.getProfissionalResponsavelId());
+
+        if (!idsNaoEncontrados.isEmpty()) {
+            String mensagemErro = "Usuário(s) com ID(s) " + idsNaoEncontrados + " não existem.";
+            throw new UsuarioNaoEncontradoException(mensagemErro);
+        }
+
+        User cliente = clienteOpt.get();
+        User profissional = profissionalOpt.get();
 
         Agendamento agendamento = new Agendamento();
         agendamento.setData(dto.getData());
@@ -37,6 +50,7 @@ public class AgendamentoService {
         agendamento = agendamentoRepository.save(agendamento);
         return toResponseDTO(agendamento);
     }
+
 
     public List<AgendamentoResponseDTO> getAllAgendamentos() {
         return agendamentoRepository.findAll()
