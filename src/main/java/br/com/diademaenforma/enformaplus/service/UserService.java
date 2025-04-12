@@ -7,7 +7,9 @@ import br.com.diademaenforma.enformaplus.model.user.User;
 import br.com.diademaenforma.enformaplus.model.user.UserDTO;
 import br.com.diademaenforma.enformaplus.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -56,6 +58,29 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public List<UserDTO> findByPapel(String papel) {
+        return userRepository.findByPapel(Papel.valueOf(papel.toUpperCase()))
+                .stream().map(this::convertToDTO).toList();
+    }
+
+    public List<UserDTO> findByEspecialidade(String especialidade) {
+        return userRepository.findByEspecialidade(Especialidade.valueOf(especialidade.toUpperCase()))
+                .stream().map(this::convertToDTO).toList();
+    }
+
+    public List<UserDTO> findByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email não pode estar vazio");
+        }
+
+        List<User> users = userRepository.findByEmailContainingIgnoreCase(email);
+        if (users.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum usuário com esse email existe");
+        }
+
+        return users.stream().map(this::convertToDTO).toList();
     }
 
     private UserDTO convertToDTO(User user) {

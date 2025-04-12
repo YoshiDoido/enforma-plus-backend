@@ -5,6 +5,7 @@ import br.com.diademaenforma.enformaplus.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar/{id}")
     public ResponseEntity<?> findUserById(@PathVariable Long id) {
         UserDTO user = userService.getUserById(id);
         if (user != null) {
@@ -24,7 +25,7 @@ public class UserController {
         return ResponseEntity.status(404).body("Usuário com esse ID não encontrado..");
     }
 
-    @GetMapping()
+    @GetMapping("/buscar")
     public ResponseEntity<?> findAllUsers() {
         List<UserDTO> users = userService.showAllUsers();
         if (users.isEmpty()) {
@@ -59,6 +60,36 @@ public class UserController {
             return ResponseEntity.ok("Usuário deletado com sucesso.");
         } else {
             return ResponseEntity.status(404).body("Usuário não encontrado para deletar.");
+        }
+    }
+
+    @GetMapping("/buscar/papel")
+    public ResponseEntity<?> buscarPorPapel(@RequestParam String papel) {
+        try {
+            var lista = userService.findByPapel(papel.toUpperCase());
+            return lista.isEmpty() ? ResponseEntity.status(404).body("Nenhum usuário com esse papel.") : ResponseEntity.ok(lista);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Papel inválido.");
+        }
+    }
+
+    @GetMapping("/buscar/especialidade")
+    public ResponseEntity<?> buscarPorEspecialidade(@RequestParam String especialidade) {
+        try {
+            var lista = userService.findByEspecialidade(especialidade.toUpperCase());
+            return lista.isEmpty() ? ResponseEntity.status(404).body("Nenhum usuário com essa especialidade.") : ResponseEntity.ok(lista);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Especialidade inválida.");
+        }
+    }
+
+    @GetMapping("/buscar/email")
+    public ResponseEntity<?> buscarPorEmail(@RequestParam String email) {
+        try {
+            var lista = userService.findByEmail(email);
+            return lista.isEmpty() ? ResponseEntity.status(404).body("Nenhum usuário com esse email.") : ResponseEntity.ok(lista);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
 
