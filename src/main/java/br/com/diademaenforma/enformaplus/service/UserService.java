@@ -8,6 +8,7 @@ import br.com.diademaenforma.enformaplus.model.user.UserDTO;
 import br.com.diademaenforma.enformaplus.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,6 +20,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id).orElse(null);
         return convertToDTO(user);
@@ -26,6 +30,7 @@ public class UserService {
 
     public UserDTO saveUser(UserDTO userDTO) {
         User user = convertToEntity(userDTO);
+        user.setSenha(passwordEncoder.encode(user.getSenha()));
         return convertToDTO(userRepository.save(user));
     }
 
@@ -88,7 +93,7 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElse(null);
 
-        if (user != null && user.getSenha().equals(senha)) {
+        if (user != null && passwordEncoder.matches(senha, user.getSenha())) {
             return convertToDTO(user);
         }
         return null;
