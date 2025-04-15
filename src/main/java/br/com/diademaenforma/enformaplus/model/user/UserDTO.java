@@ -1,8 +1,6 @@
 package br.com.diademaenforma.enformaplus.model.user;
 
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 @Data
 public class UserDTO {
@@ -13,6 +11,8 @@ public class UserDTO {
     private String senha;
     private String papel;
     private String especialidade;
+    private Long localId;
+    private String LocalNome;
     private String dataCriacao;
     private String dataAtualizacao;
 

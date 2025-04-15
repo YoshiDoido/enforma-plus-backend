@@ -1,6 +1,7 @@
 package br.com.diademaenforma.enformaplus.service;
 
 
+import br.com.diademaenforma.enformaplus.model.local.Local;
 import br.com.diademaenforma.enformaplus.model.user.Especialidade;
 import br.com.diademaenforma.enformaplus.model.user.Papel;
 import br.com.diademaenforma.enformaplus.model.user.User;
@@ -110,6 +111,12 @@ public class UserService {
         dto.setEspecialidade(user.getEspecialidade() != null ? user.getEspecialidade().name() : null);
         dto.setDataCriacao(user.getDataCriacao());
         dto.setDataAtualizacao(user.getDataAtualizacao());
+
+        if (user.getLocal() != null) {
+            dto.setLocalId(user.getLocal().getId());
+            dto.setLocalNome(user.getLocal().getNome());
+        }
+
         return dto;
     }
 
@@ -124,6 +131,12 @@ public class UserService {
             user.setPapel(Papel.valueOf(dto.getPapel()));
         if (dto.getEspecialidade() != null)
             user.setEspecialidade(Especialidade.valueOf(dto.getEspecialidade()));
+        if (dto.getLocalId() != null) {
+            Local local = new Local();
+            local.setId(dto.getLocalId());
+            user.setLocal(local);
+        }
         return user;
     }
+
 }
