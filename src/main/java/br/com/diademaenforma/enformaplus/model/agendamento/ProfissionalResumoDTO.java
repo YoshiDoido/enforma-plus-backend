@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ProfissionalResumoDTO {
-    private Long id;
-    private String user;
+    private Long profissionalId;
+    private String usuario;
     private String especialidade;
 }

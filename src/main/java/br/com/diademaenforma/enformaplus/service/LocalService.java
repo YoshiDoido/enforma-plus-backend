@@ -1,5 +1,6 @@
 package br.com.diademaenforma.enformaplus.service;
 
+import br.com.diademaenforma.enformaplus.model.agendamento.ProfissionalResumoDTO;
 import br.com.diademaenforma.enformaplus.model.local.Local;
 import br.com.diademaenforma.enformaplus.model.local.LocalDTO;
 import br.com.diademaenforma.enformaplus.model.local.LocalResponseDTO;
@@ -74,15 +75,23 @@ public class LocalService {
         dto.setNome(local.getNome());
 
         if (local.getUsuariosProfissionais() != null) {
-            List<Long> ids = local.getUsuariosProfissionais()
+            List<ProfissionalResumoDTO> profissionais = local.getUsuariosProfissionais()
                     .stream()
-                    .map(User::getId)
+                    .map(user -> {
+                        ProfissionalResumoDTO p = new ProfissionalResumoDTO();
+                        p.setProfissionalId(user.getId());
+                        p.setUsuario(user.getUsuario());
+                        p.setEspecialidade(user.getEspecialidade() != null ? user.getEspecialidade().toString() : null);
+                        return p;
+                    })
                     .collect(Collectors.toList());
-            dto.setUsuariosProfissionais(ids);
+
+            dto.setUsuariosProfissionais(profissionais);
         }
 
         return dto;
     }
+
 
 }
 

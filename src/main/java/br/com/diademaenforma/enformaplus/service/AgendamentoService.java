@@ -130,8 +130,8 @@ public class AgendamentoService {
         cliente.setUser(a.getUsuarioCliente().getUsuario());
 
         ProfissionalResumoDTO profissional = new ProfissionalResumoDTO();
-        profissional.setId(a.getProfissionalResponsavel().getId());
-        profissional.setUser(a.getProfissionalResponsavel().getUsuario());
+        profissional.setProfissionalId(a.getProfissionalResponsavel().getId());
+        profissional.setUsuario(a.getProfissionalResponsavel().getUsuario());
         profissional.setEspecialidade(a.getProfissionalResponsavel().getEspecialidade().name());
 
         AgendamentoResponseDTO dto = new AgendamentoResponseDTO();
