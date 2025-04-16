@@ -6,4 +6,8 @@ import lombok.Data;
 public class LocalDTO {
     private Long id;
     private String nome;
+    private String endereco;
+    private String horarioFuncionamento;
+    private String telefone;
 }
+

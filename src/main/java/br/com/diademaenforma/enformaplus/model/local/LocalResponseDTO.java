@@ -9,5 +9,8 @@ import java.util.List;
 public class LocalResponseDTO {
     private Long id;
     private String nome;
+    private String endereco;
+    private String horarioFuncionamento;
+    private String telefone;
     private List<ProfissionalResumoDTO> usuariosProfissionais;
 }

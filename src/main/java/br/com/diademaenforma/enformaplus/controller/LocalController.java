@@ -8,6 +8,7 @@ import br.com.diademaenforma.enformaplus.repository.LocalRepository;
 import br.com.diademaenforma.enformaplus.repository.UserRepository;
 import br.com.diademaenforma.enformaplus.service.LocalService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,6 +41,16 @@ public class LocalController {
     @PutMapping("/atualizar/{id}")
     public LocalDTO atualizar(@PathVariable Long id, @RequestBody LocalDTO dto) {
         return localService.atualizarLocal(id, dto);
+    }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<?> deletar(@PathVariable Long id) {
+        try {
+            localService.deletarLocal(id);
+            return ResponseEntity.ok("Local deletado com sucesso.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
 }
