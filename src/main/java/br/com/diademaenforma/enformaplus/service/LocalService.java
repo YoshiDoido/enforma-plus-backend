@@ -31,19 +31,19 @@ public class LocalService {
     public List<LocalResponseDTO> listarTodos() {
         return localRepository.findAll()
                 .stream()
-                .map(this::convertToResponseDTO) // ✅ certo
+                .map(this::convertToResponseDTO)
                 .toList();
     }
 
     public LocalResponseDTO buscarPorId(Long id) {
         Local local = localRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Local não encontrado"));
-        return convertToResponseDTO(local); // ✅ certo
+        return convertToResponseDTO(local);
     }
 
     public LocalDTO atualizarLocal(Long id, LocalDTO dto) {
         Local local = localRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Local não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Local não encontrado"));
 
         local.setNome(dto.getNome());
         local.setEndereco(dto.getEndereco());
@@ -54,11 +54,18 @@ public class LocalService {
     }
 
     public void deletarLocal(Long id) {
-        if (!localRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Local não encontrado");
-        }
+        Local local = localRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Local não encontrado"));
+
+        // Desvincula os usuários, se o local já tiver pelo menos 1 usuário vinculado, irá acontecer um erro de integridade de dados
+        local.getUsuariosProfissionais().forEach(user -> {
+            user.setLocal(null);
+            userRepository.save(user);
+        });
+
         localRepository.deleteById(id);
     }
+
 
     private Local convertToEntity(LocalDTO dto) {
         Local local = new Local();
