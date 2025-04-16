@@ -12,7 +12,7 @@ public class UserDTO {
     private String papel;
     private String especialidade;
     private Long localId;
-    private String LocalNome;
+    private String localNome;
     private String dataCriacao;
     private String dataAtualizacao;
 

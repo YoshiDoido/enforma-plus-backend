@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -23,6 +24,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    // Método reutilizável para conversão de Data, Hora e Zona
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yy'T'HH:mm:ss");
 
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id).orElse(null);
@@ -109,8 +113,10 @@ public class UserService {
         dto.setSenha(user.getSenha());
         dto.setPapel(user.getPapel() != null ? user.getPapel().name() : null);
         dto.setEspecialidade(user.getEspecialidade() != null ? user.getEspecialidade().name() : null);
-        dto.setDataCriacao(user.getDataCriacao());
-        dto.setDataAtualizacao(user.getDataAtualizacao());
+
+        // Formatando datas de acordo com esse formato (Dia-Mes-Ano: Fuso Horário: Hora-Minutos-Segundos)
+        dto.setDataCriacao(user.getDataCriacao() != null ? user.getDataCriacao().format(FORMATTER) : null);
+        dto.setDataAtualizacao(user.getDataAtualizacao() != null ? user.getDataAtualizacao().format(FORMATTER) : null);
 
         if (user.getLocal() != null) {
             dto.setLocalId(user.getLocal().getId());

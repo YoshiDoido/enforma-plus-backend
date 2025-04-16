@@ -1,10 +1,13 @@
 package br.com.diademaenforma.enformaplus.model.local;
 
 import br.com.diademaenforma.enformaplus.model.user.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -24,8 +27,10 @@ public class Local {
     private List<User> usuariosProfissionais;
 
     @CreationTimestamp
-    private String dataCadastro;
+    @JsonFormat(pattern = "dd-MM-yy'T'HH:mm:ss")
+    private LocalDateTime dataCadastro;
 
-    @CreationTimestamp
-    private String dataUltimaAtualizacao;
+    @UpdateTimestamp
+    @JsonFormat(pattern = "dd-MM-yy'T'HH:mm:ss")
+    private LocalDateTime dataUltimaAtualizacao;
 }
