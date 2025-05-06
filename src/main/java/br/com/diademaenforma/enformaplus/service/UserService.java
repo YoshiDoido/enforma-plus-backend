@@ -34,6 +34,18 @@ public class UserService {
     }
 
     public UserDTO saveUser(UserDTO userDTO) {
+        if (userDTO.getUsuario() == null || userDTO.getUsuario().isBlank()
+                || userDTO.getEmail() == null || userDTO.getEmail().isBlank()
+                || userDTO.getSenha() == null || userDTO.getSenha().isBlank()
+                || userDTO.getPapel() == null || userDTO.getPapel().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dados obrigatórios ausentes");
+        }
+
+        if (userDTO.getPapel().equals("USUARIO_PROFISSIONAL") &&
+                (userDTO.getEspecialidade() == null || userDTO.getEspecialidade().isBlank())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Especialidade obrigatória para profissional");
+        }
+
         User user = convertToEntity(userDTO);
         user.setSenha(passwordEncoder.encode(user.getSenha()));
         return convertToDTO(userRepository.save(user));

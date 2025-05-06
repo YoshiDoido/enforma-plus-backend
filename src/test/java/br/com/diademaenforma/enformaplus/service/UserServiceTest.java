@@ -10,9 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -56,6 +56,61 @@ public class UserServiceTest {
         assertEquals("Paulo Ferreira", result.getUsuario());
         assertEquals("paulo.ferreira@gmail.com", result.getEmail());
         assertEquals("USUARIO_COMUM", result.getPapel());
+    }
+
+    @Test
+    void ct02_erro_somente_nome() {
+        UserDTO inputDto = new UserDTO();
+        inputDto.setUsuario("João");
+
+        assertThrows(ResponseStatusException.class, () -> userService.saveUser(inputDto));
+    }
+
+    @Test
+    void ct03_erro_somente_email() {
+        UserDTO inputDto = new UserDTO();
+        inputDto.setEmail("joao@email.com");
+
+        assertThrows(ResponseStatusException.class, () -> userService.saveUser(inputDto));
+    }
+
+    @Test
+    void ct04_erro_somente_senha() {
+        UserDTO inputDto = new UserDTO();
+        inputDto.setSenha("123456");
+
+        assertThrows(ResponseStatusException.class, () -> userService.saveUser(inputDto));
+    }
+
+    @Test
+    void ct05_erro_somente_papel() {
+        UserDTO inputDto = new UserDTO();
+        inputDto.setPapel("USUARIO_COMUM");
+
+        assertThrows(ResponseStatusException.class, () -> userService.saveUser(inputDto));
+    }
+
+    @Test
+    void ct06_erro_papel_profissional_sem_especialidade() {
+        UserDTO inputDto = new UserDTO();
+        inputDto.setUsuario("Maria");
+        inputDto.setEmail("maria@email.com");
+        inputDto.setSenha("123456");
+        inputDto.setPapel("USUARIO_PROFISSIONAL");
+
+        assertThrows(ResponseStatusException.class, () -> userService.saveUser(inputDto));
+    }
+
+    @Test
+    void ct07_erro_campos_obrigatorios_ausentes_profissional() {
+        UserDTO inputDto = new UserDTO();
+        inputDto.setPapel("USUARIO_PROFISSIONAL");
+        inputDto.setEspecialidade("NUTRICIONISTA");
+
+        assertThrows(ResponseStatusException.class,
+                () -> userService.saveUser(inputDto),
+                "Esperado erro de BAD_REQUEST quando faltam campos obrigatórios"
+        );
     }
 
 }
