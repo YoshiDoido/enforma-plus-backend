@@ -12,6 +12,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -48,6 +50,7 @@ public class UserServiceTest {
         user.setPapel(Papel.USUARIO_COMUM);
 
         when(passwordEncoder.encode("paulo123")).thenReturn("encodedSenha");
+        when(userRepository.findByEmail("paulo.ferreira@gmail.com")).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         UserDTO result = userService.saveUser(inputDto);
@@ -59,7 +62,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void ct02_erro_somente_nome() {
+    void ct02_erro_cadastro_somente_com_nome() {
         UserDTO inputDto = new UserDTO();
         inputDto.setUsuario("João");
 
@@ -67,7 +70,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void ct03_erro_somente_email() {
+    void ct03_erro_cadastro_somente_com_email() {
         UserDTO inputDto = new UserDTO();
         inputDto.setEmail("joao@email.com");
 
@@ -75,7 +78,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void ct04_erro_somente_senha() {
+    void ct04_erro_cadastro_somente_com_senha() {
         UserDTO inputDto = new UserDTO();
         inputDto.setSenha("123456");
 
@@ -83,7 +86,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void ct05_erro_somente_papel() {
+    void ct05_erro_cadastro_somente_com_papel() {
         UserDTO inputDto = new UserDTO();
         inputDto.setPapel("USUARIO_COMUM");
 
@@ -91,7 +94,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void ct06_erro_papel_profissional_sem_especialidade() {
+    void ct06_erro_cadastro_papel_profissional_sem_especialidade() {
         UserDTO inputDto = new UserDTO();
         inputDto.setUsuario("Maria");
         inputDto.setEmail("maria@email.com");
@@ -102,7 +105,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void ct07_erro_campos_obrigatorios_ausentes_profissional() {
+    void ct07_erro_cadastro_com_campos_obrigatorios_ausentes_profissional() {
         UserDTO inputDto = new UserDTO();
         inputDto.setPapel("USUARIO_PROFISSIONAL");
         inputDto.setEspecialidade("NUTRICIONISTA");
@@ -111,6 +114,25 @@ public class UserServiceTest {
                 () -> userService.saveUser(inputDto),
                 "Esperado erro de BAD_REQUEST quando faltam campos obrigatórios"
         );
+    }
+
+    @Test
+    void ct08_erro_cadastro_com_email_ja_existente() {
+        UserDTO inputDto = new UserDTO();
+        inputDto.setUsuario("João");
+        inputDto.setEmail("joao@email.com");
+        inputDto.setSenha("123456");
+        inputDto.setPapel("USUARIO_COMUM");
+
+        // Simula que já existe um usuário com esse e-mail
+        User existingUser = new User();
+        existingUser.setId(1L);
+        existingUser.setEmail("joao@email.com");
+
+        when(userRepository.findByEmail("joao@email.com")).thenReturn(Optional.of(existingUser));
+
+
+        assertThrows(ResponseStatusException.class, () -> userService.saveUser(inputDto));
     }
 
 }

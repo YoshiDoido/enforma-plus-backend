@@ -41,15 +41,20 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dados obrigatórios ausentes");
         }
 
-        if (userDTO.getPapel().equals("USUARIO_PROFISSIONAL") &&
+        if (userDTO.getPapel().equalsIgnoreCase("USUARIO_PROFISSIONAL") &&
                 (userDTO.getEspecialidade() == null || userDTO.getEspecialidade().isBlank())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Especialidade obrigatória para profissional");
+        }
+
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "E-mail já cadastrado");
         }
 
         User user = convertToEntity(userDTO);
         user.setSenha(passwordEncoder.encode(user.getSenha()));
         return convertToDTO(userRepository.save(user));
     }
+
 
     public List<UserDTO> showAllUsers() {
         List<User> users = userRepository.findAll();
