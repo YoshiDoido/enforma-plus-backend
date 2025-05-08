@@ -11,5 +11,5 @@ public class AgendamentoResponseDTO {
     private String tipo;
     private String status;
     private UsuarioResumoDTO usuarioCliente;
-    private ProfissionalResumoDTO profissionalResponsavel;
+    private ProfissionalResumoComLocalDTO profissionalResponsavel;
 }

@@ -1,5 +1,6 @@
 package br.com.diademaenforma.enformaplus.service;
 
+import br.com.diademaenforma.enformaplus.model.agendamento.ProfissionalResumoComLocalDTO;
 import br.com.diademaenforma.enformaplus.model.agendamento.ProfissionalResumoDTO;
 import br.com.diademaenforma.enformaplus.model.local.Local;
 import br.com.diademaenforma.enformaplus.model.local.LocalDTO;

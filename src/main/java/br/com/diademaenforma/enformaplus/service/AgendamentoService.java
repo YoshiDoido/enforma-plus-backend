@@ -129,10 +129,14 @@ public class AgendamentoService {
         cliente.setId(a.getUsuarioCliente().getId());
         cliente.setUser(a.getUsuarioCliente().getUsuario());
 
-        ProfissionalResumoDTO profissional = new ProfissionalResumoDTO();
+        ProfissionalResumoComLocalDTO profissional = new ProfissionalResumoComLocalDTO();
         profissional.setProfissionalId(a.getProfissionalResponsavel().getId());
         profissional.setUsuario(a.getProfissionalResponsavel().getUsuario());
         profissional.setEspecialidade(a.getProfissionalResponsavel().getEspecialidade().name());
+
+        if (a.getProfissionalResponsavel().getLocal() != null) {
+            profissional.setLocalNome(a.getProfissionalResponsavel().getLocal().getNome());
+        }
 
         AgendamentoResponseDTO dto = new AgendamentoResponseDTO();
         dto.setId(a.getId());  // Incluindo o ID
