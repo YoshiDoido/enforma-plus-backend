@@ -110,6 +110,13 @@ public class UserService {
         return users.stream().map(this::convertToDTO).toList();
     }
 
+    public List<UserDTO> findAllProfissionais() {
+        return userRepository.findByPapel(Papel.USUARIO_PROFISSIONAL)
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
     // Método para fazer login com usuário cadastrado
     public UserDTO login(String email, String senha) {
         User user = userRepository.findByEmail(email)

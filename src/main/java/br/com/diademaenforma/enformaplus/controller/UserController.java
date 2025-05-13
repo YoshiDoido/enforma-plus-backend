@@ -93,4 +93,13 @@ public class UserController {
         }
     }
 
+    @GetMapping("/buscar/buscar-todos-profissionais")
+    public ResponseEntity<?> buscarTodosProfissionais() {
+        var lista = userService.findAllProfissionais();
+        return lista.isEmpty()
+                ? ResponseEntity.status(404).body("Nenhum profissional encontrado.")
+                : ResponseEntity.ok(lista);
+    }
+
+
 }
