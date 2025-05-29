@@ -132,7 +132,12 @@ public class AgendamentoService {
         ProfissionalResumoComLocalDTO profissional = new ProfissionalResumoComLocalDTO();
         profissional.setProfissionalId(a.getProfissionalResponsavel().getId());
         profissional.setUsuario(a.getProfissionalResponsavel().getUsuario());
-        profissional.setEspecialidade(a.getProfissionalResponsavel().getEspecialidade().name());
+        profissional.setEspecialidade(
+                a.getProfissionalResponsavel().getEspecialidade() != null
+                        ? a.getProfissionalResponsavel().getEspecialidade().name()
+                        : "NÃO DEFINIDA"
+        );
+
 
         if (a.getProfissionalResponsavel().getLocal() != null) {
             profissional.setLocalNome(a.getProfissionalResponsavel().getLocal().getNome());
