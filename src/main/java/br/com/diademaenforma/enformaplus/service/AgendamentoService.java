@@ -132,19 +132,25 @@ public class AgendamentoService {
         ProfissionalResumoComLocalDTO profissional = new ProfissionalResumoComLocalDTO();
         profissional.setProfissionalId(a.getProfissionalResponsavel().getId());
         profissional.setUsuario(a.getProfissionalResponsavel().getUsuario());
-        profissional.setEspecialidade(
-                a.getProfissionalResponsavel().getEspecialidade() != null
-                        ? a.getProfissionalResponsavel().getEspecialidade().name()
-                        : "NÃO DEFINIDA"
-        );
 
+        // Buscar o profissional completo para garantir que especialidade e local estejam carregados
+        User profissionalCompleto = userRepository.findById(a.getProfissionalResponsavel().getId())
+                .orElseThrow(() -> new RuntimeException("Profissional não encontrado ao converter agendamento"));
 
-        if (a.getProfissionalResponsavel().getLocal() != null) {
-            profissional.setLocalNome(a.getProfissionalResponsavel().getLocal().getNome());
+        // Garantir que a especialidade seja preenchida corretamente
+        if (profissionalCompleto.getEspecialidade() != null) {
+            profissional.setEspecialidade(profissionalCompleto.getEspecialidade().name());
+        } else {
+            profissional.setEspecialidade("NÃO DEFINIDA");
+        }
+
+        // Garantir que o local, se existir, seja preenchido corretamente
+        if (profissionalCompleto.getLocal() != null) {
+            profissional.setLocalNome(profissionalCompleto.getLocal().getNome());
         }
 
         AgendamentoResponseDTO dto = new AgendamentoResponseDTO();
-        dto.setId(a.getId());  // Incluindo o ID
+        dto.setId(a.getId());
         dto.setData(a.getData());
         dto.setHora(a.getHora());
         dto.setDescricao(a.getDescricao());
@@ -155,5 +161,7 @@ public class AgendamentoService {
 
         return dto;
     }
+
+
 
 }

@@ -4,6 +4,8 @@ import br.com.diademaenforma.enformaplus.model.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Data
@@ -23,10 +25,14 @@ public class Agendamento {
 
     @ManyToOne
     @JoinColumn(name = "usuario_cliente_id")
+    @Fetch(FetchMode.JOIN)
     private User usuarioCliente;
+
     @ManyToOne
     @JoinColumn(name = "profissional_responsavel_id")
+    @Fetch(FetchMode.JOIN)
     private User profissionalResponsavel;
+
     @CreationTimestamp
     private String dataCriacao;
     @UpdateTimestamp
