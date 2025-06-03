@@ -4,6 +4,7 @@ import br.com.diademaenforma.enformaplus.exceptions.UsuarioNaoEncontradoExceptio
 import br.com.diademaenforma.enformaplus.model.agendamento.*;
 import br.com.diademaenforma.enformaplus.model.user.Especialidade;
 import br.com.diademaenforma.enformaplus.model.user.User;
+import br.com.diademaenforma.enformaplus.rabbitmq.AgendamentoProducer;
 import br.com.diademaenforma.enformaplus.repository.AgendamentoRepository;
 import br.com.diademaenforma.enformaplus.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class AgendamentoService {
 
     @Autowired
     private AgendamentoRepository agendamentoRepository;
+
+    @Autowired
+    private AgendamentoProducer agendamentoProducer;
 
     public AgendamentoResponseDTO createAgendamento(AgendamentoRequestDTO dto) {
         List<Long> idsNaoEncontrados = new ArrayList<>();
@@ -49,7 +53,11 @@ public class AgendamentoService {
         agendamento.setProfissionalResponsavel(profissional);
 
         agendamento = agendamentoRepository.save(agendamento);
-        return toResponseDTO(agendamento);
+
+        AgendamentoResponseDTO responseDTO = toResponseDTO(agendamento);
+        agendamentoProducer.enviarMensagem(responseDTO);
+
+        return responseDTO;
     }
 
 

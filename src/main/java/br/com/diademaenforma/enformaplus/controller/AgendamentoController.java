@@ -46,10 +46,10 @@ public class AgendamentoController {
         } catch (UsuarioNaoEncontradoException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Erro ao criar o agendamento.");
+            e.printStackTrace(); // mostra erro real no console
+            return ResponseEntity.status(500).body("Erro inesperado ao criar o agendamento: " + e.getMessage());
         }
     }
-
 
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
