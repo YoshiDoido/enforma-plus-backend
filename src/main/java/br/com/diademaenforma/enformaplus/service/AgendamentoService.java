@@ -7,7 +7,6 @@ import br.com.diademaenforma.enformaplus.model.user.User;
 import br.com.diademaenforma.enformaplus.rabbitmq.AgendamentoProducer;
 import br.com.diademaenforma.enformaplus.repository.AgendamentoRepository;
 import br.com.diademaenforma.enformaplus.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,14 +16,18 @@ import java.util.Optional;
 @Service
 public class AgendamentoService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final AgendamentoRepository agendamentoRepository;
+    private final AgendamentoProducer agendamentoProducer;
+    private final AcessoProfissionalService acessoService;
 
-    @Autowired
-    private AgendamentoRepository agendamentoRepository;
-
-    @Autowired
-    private AgendamentoProducer agendamentoProducer;
+    public AgendamentoService(UserRepository userRepository,  AgendamentoRepository agendamentoRepository,
+                              AgendamentoProducer agendamentoProducer, AcessoProfissionalService acessoService) {
+        this.userRepository = userRepository;
+        this.agendamentoRepository = agendamentoRepository;
+        this.agendamentoProducer = agendamentoProducer;
+        this.acessoService = acessoService;
+    }
 
     public AgendamentoResponseDTO createAgendamento(AgendamentoRequestDTO dto) {
         List<Long> idsNaoEncontrados = new ArrayList<>();
@@ -53,6 +56,12 @@ public class AgendamentoService {
         agendamento.setProfissionalResponsavel(profissional);
 
         agendamento = agendamentoRepository.save(agendamento);
+
+        // Registra automaticamente o acesso após criar o agendamento
+        acessoService.registrarAcesso(
+                agendamento.getUsuarioCliente().getId(),
+                agendamento.getProfissionalResponsavel().getId()
+        );
 
         AgendamentoResponseDTO responseDTO = toResponseDTO(agendamento);
         agendamentoProducer.enviarMensagem(responseDTO);
